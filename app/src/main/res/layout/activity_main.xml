@@ -44,4 +44,12 @@
         android:id="@+id/button_top_use"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Выгрузить последние"
+        android:id="@+id/button_lasts_export"
+        android:layout_below="@+id/button_top_use"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
 </RelativeLayout>

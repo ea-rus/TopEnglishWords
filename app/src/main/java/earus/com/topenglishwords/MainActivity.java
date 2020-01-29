@@ -32,7 +32,7 @@ public class MainActivity extends Activity {
         Button button_unknown = (Button) findViewById(R.id.button_unknown);
         Button button_stat = (Button) findViewById(R.id.button_stat);
         Button button_top_use = (Button) findViewById(R.id.button_top_use);
-
+        Button button_lasts_export = (Button) findViewById(R.id.button_lasts_export);
 
         button_new.setOnClickListener(
                 new View.OnClickListener() {
@@ -68,6 +68,60 @@ public class MainActivity extends Activity {
                 }
         );
 
+        button_lasts_export.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        SQLiteDatabase db = SQLiteDatabase.openDatabase(Learn.DB_PATH, null, SQLiteDatabase.OPEN_READWRITE);
+                        String[] args = {};
+                        Cursor cursor = db.rawQuery("select eng, state, count, DATE(lastdate) as lastdate from words where lastdate > date('now',  '-3 day') order by DATE(lastdate) desc, state, eng", args);
+
+                        String out="";
+                        cursor.moveToFirst();
+
+                        String cur_lastdate="";
+                        String lastdate="";
+                        for (int i=0; i<cursor.getCount(); i++){
+
+                            out+= cursor.getString(cursor.getColumnIndex("eng"));
+                            out+= " : ";
+                            out+= cursor.getString(cursor.getColumnIndex("state"));
+                            out+= " ";
+                            out+= cursor.getString(cursor.getColumnIndex("count"));
+                            out+= "\n";
+
+                            lastdate = cursor.getString(cursor.getColumnIndex("lastdate"));
+                            if (!cur_lastdate.equals(lastdate)){
+                                if (!cur_lastdate.equals("")) out+= "\n";
+                                cur_lastdate = lastdate;
+                            }
+                            cursor.moveToNext();
+                        }
+                        cursor.close();
+                        db.close();
+
+//                        Toast toast = Toast.makeText(getApplicationContext(),
+//                                out, Toast.LENGTH_SHORT);
+//                        toast.show();
+//                        return;
+
+                        if (out.equals("")){
+                            Toast toast = Toast.makeText(getApplicationContext(),
+                                    "No words", Toast.LENGTH_SHORT);
+                            toast.show();
+                        }else {
+                            Intent sendIntent = new Intent();
+                            sendIntent.setAction(Intent.ACTION_SEND);
+                            sendIntent.putExtra(Intent.EXTRA_TEXT, out);
+                            sendIntent.setType("text/plain");
+
+                            Intent shareIntent = Intent.createChooser(sendIntent, null);
+                            startActivity(shareIntent);
+                        }
+
+                    }
+                }
+        );
 
 
         button_stat.setOnClickListener(
